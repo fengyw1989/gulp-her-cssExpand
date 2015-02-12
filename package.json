@@ -1,7 +1,7 @@
 {
   "name": "gulp-her-cssExpand",
   "version": "0.0.1",
-  "description": "expand css ability",
+  "description": "expand css ability,depends gulp-her-kernel",
   "author": {
     "name": "huangyi",
     "email": "ustbhuangyi@gmail.com"

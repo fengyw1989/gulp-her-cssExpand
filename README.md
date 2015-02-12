@@ -1,2 +1,2 @@
 # gulp-her-cssExpand
-expand css ability
+expand css ability,depends gulp-her-kernel
