@@ -1,7 +1,7 @@
 /**
  * expand css ability
- * analysis '@require xxx' from comment to add file requires
- * analysis 'url(xxx)' to expand ptah
+ * analyse [@require id] syntax in comment to add file requires
+ * analyse [url(xxx)] syntax to expand ptah
  */
 'use strict';
 
@@ -45,7 +45,7 @@ module.exports = function (opt) {
     if (file.isStream()) {
       return callback(createError(file, 'Streaming not supported'));
     }
-    //match /*@require xxx*/ or url(xxx)
+    //match [@require id] or [url(xxx)]
     var reg = /(\/\*[\s\S]*?(?:\*\/|$))|\burl\s*\(\s*("(?:[^\\"\r\n\f]|\\[\s\S])*"|'(?:[^\\'\n\r\f]|\\[\s\S])*'|[^)}\s]+)\s*\)/g;
 
     var content = String(file.contents);
