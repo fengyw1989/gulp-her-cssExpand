@@ -36,6 +36,9 @@ function analyseComment(comment, callback) {
 }
 
 module.exports = function (opt) {
+
+  var useHash = her.config.get('useHash');
+
   function expand(file, encoding, callback) {
 
     if (file.isNull()) {
@@ -50,12 +53,13 @@ module.exports = function (opt) {
 
     var content = String(file.contents);
 
+
     content = content.replace(reg, function (m, comment, url) {
       if (url) {
         var info = her.uri(url, file.dirname);
         var ret;
         if (info.file && info.file.isFile()) {
-          url = info.file.getUrl();
+          url = info.file.getUrl(useHash);
           ret = info.quote + url + info.quote;
         } else {
           ret = url;
