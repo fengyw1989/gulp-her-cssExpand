@@ -35,6 +35,7 @@ function analyseComment(comment, callback) {
   return comment.replace(reg, callback);
 }
 
+
 module.exports = function (opt) {
 
   var useHash = her.config.get('useHash');
@@ -50,22 +51,17 @@ module.exports = function (opt) {
       return callback(createError(file, 'Streaming not supported'));
     }
     //match [@require id] or [url(xxx)]
-    var reg = /(\/\*[\s\S]*?(?:\*\/|$))|\burl\s*\(\s*("(?:[^\\"\r\n\f]|\\[\s\S])*"|'(?:[^\\'\n\r\f]|\\[\s\S])*'|[^)}\s]+)\s*\)/g;
+    var reg = /(\/\*[\s\S]*?(?:\*\/|$))|\burl\s*\(\s*("(?:[^\\"\r\n\f]|\\[\s\S])*"|'(?:[^\\'\n\r\f]|\\[\s\S])*'|[^)}\s]+)\s*\)|\bsrc\s*=\s*("(?:[^\\"\r\n\f]|\\[\s\S])*"|'(?:[^\\'\n\r\f]|\\[\s\S])*'|[^\s}]+)/g;
 
     var content = String(file.contents);
 
-    content = content.replace(reg, function (m, comment, url) {
+    content = content.replace(reg, function (m, comment, url, filter) {
       if (url) {
-        var info = her.uri(url, file.dirname);
-        var ret;
-        if (info.file && info.file.isFile()) {
-          url = info.file.getUrl(useHash, useDomain);
-          ret = info.quote + url + info.query + info.hash + info.quote;
-        } else {
-          ret = url;
-        }
-        m = 'url(' + ret + ')';
-      } else if (comment) {
+        m = 'url(' + getUrl(url, file) + ')';
+      } else if (filter) {
+        m = 'src=' + getUrl(filter, file);
+      }
+      else if (comment) {
         m = analyseComment(comment, function (all, prefix, value) {
           var dep = her.uri.getId(value, file.dirname).id;
           file.addRequire(dep);
@@ -78,6 +74,20 @@ module.exports = function (opt) {
     file.contents = new Buffer(content);
 
     callback(null, file);
+  }
+
+  function getUrl(str, file) {
+    var ret;
+    var info = her.uri(str, file.dirname);
+
+    if (info.file && info.file.isFile()) {
+      str = info.file.getUrl(useHash, useDomain);
+      ret = info.quote + str + info.query + info.hash + info.quote;
+    } else {
+      ret = str;
+    }
+
+    return ret;
   }
 
   return through.obj(expand);
